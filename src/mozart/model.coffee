@@ -60,7 +60,7 @@ exports.Model = class Model extends MztObject
       @polyFks[k] = v
       if Model.DataIndexForeignKeys then @index k
 
-  # belongsTo - General use belongsTo relation. The foreign key exists on 
+  # belongsTo - General use belongsTo relation. The foreign key exists on
   # this the declaring model and points to the other model.
   # - belongsTo is the opposite side of a hasOne or a hasMany relation
   belongsTo: (model, attribute, fkname)  =>
@@ -89,7 +89,7 @@ exports.Model = class Model extends MztObject
         id = @[fkname]
         return null unless id?
         model.findById(id)
-    
+
     @instanceClass.extend(obj)
 
     Xthis = @
@@ -120,7 +120,7 @@ exports.Model = class Model extends MztObject
         # setting
         for inst in model.findByAttribute(fkname, @id)
           if inst!=value
-            inst.set(fkname, null) 
+            inst.set(fkname, null)
             inst.save()
         return if value == null
         value.set(fkname, @id)
@@ -141,7 +141,7 @@ exports.Model = class Model extends MztObject
         inst.save()
 
     @subscribe('destroy', onDelete)
-    
+
   # belongsToPoly - Polymorphic belongsTo. The foreign key and type exist on
   # this the declaring model and point to the other model when the
   # type field contains this model name.
@@ -179,7 +179,7 @@ exports.Model = class Model extends MztObject
         modelClass = Model.models[@[fktypename]]
         return null unless id? and modelClass?
         modelClass.findById(id)
-    
+
     @instanceClass.extend(obj)
 
     Xthis = @
@@ -211,7 +211,7 @@ exports.Model = class Model extends MztObject
     fkn[fkname] = @
     model.foreignKeys fkn
 
-    @relations[attribute] = 
+    @relations[attribute] =
       type: 'hasMany'
       otherModel: model
       foreignKeyAttribute: fkname
@@ -242,14 +242,14 @@ exports.Model = class Model extends MztObject
     @subscribe('destroy', onDelete)
 
   # hasManyPoly - A polymorphic hasMany relation where the foreign key and type
-  # exist on the other model and points to this the declaring model when 
+  # exist on the other model and points to this the declaring model when
   # the type field is this model name.
-  # - hasManyPoly is the opposite side of a belongsToPoly relation 
+  # - hasManyPoly is the opposite side of a belongsToPoly relation
   hasManyPoly: (model, attribute, thatFkAttr, thatTypeAttr) ->
-    attribute ?= @toSnakeCase(model.modelName) 
+    attribute ?= @toSnakeCase(model.modelName)
     thatFkAttr ?= attribute+"_id"
     thatTypeAttr ?= attribute+"_type"
-    
+
     fk = {}
     fk[thatFkAttr] = 'integer'
     fk[thatTypeAttr] = 'string'
@@ -258,7 +258,7 @@ exports.Model = class Model extends MztObject
     fkn[thatFkAttr] = thatTypeAttr
     model.polyForeignKeys fkn
 
-    @relations[attribute] = 
+    @relations[attribute] =
       type: 'hasManyPoly'
       otherModel: model
       foreignKeyAttribute: thatFkAttr
@@ -294,7 +294,7 @@ exports.Model = class Model extends MztObject
   # where the foreign keys on both sides exist on an intermediate link model.
   hasManyThrough: (model, attribute, linkModel, thisFkAttr, thatFkAttr) =>
     # get the attribute name and fks and add them to the LINK model
-    attribute ?= @toSnakeCase(model.modelName) 
+    attribute ?= @toSnakeCase(model.modelName)
     fk = {}
     thisFkAttr ?= @toSnakeCase(@modelName+"_id")
     thatFkAttr ?= @toSnakeCase(model.modelName)+"_id"
@@ -306,7 +306,7 @@ exports.Model = class Model extends MztObject
     fkn[thatFkAttr] = model
     linkModel.foreignKeys fkn
 
-    @relations[attribute] = 
+    @relations[attribute] =
       type: 'hasManyThrough'
       otherModel: model
       linkModel: linkModel
@@ -334,18 +334,18 @@ exports.Model = class Model extends MztObject
       for link in linkModel.findByAttribute(thisFkAttr, instance.id)
         link.destroy(options)
     @subscribe('destroy', onDeleteF)
-    
+
     onDeleteB = (instance, options={}) ->
       for link in linkModel.findByAttribute(thatFkAttr, instance.id)
         link.destroy(options)
     model.subscribe('destroy', onDeleteB)
 
-  # hasManyThroughPoly is a polymorphic many-to-many relation where both foreign 
+  # hasManyThroughPoly is a polymorphic many-to-many relation where both foreign
   # keys and the type exist on a linkmodel.
   # - hasManyThroughPoly is the opposite side of a hasManyThroughPolyReverse relation
   hasManyThroughPoly: (model, attribute, linkModel, thisFkAttr, thatFkAttr, thatTypeAttr) ->
     # get the attribute name, fk, id and type fields and add them to the LINK model
-    attribute ?= @toSnakeCase(model.modelName) 
+    attribute ?= @toSnakeCase(model.modelName)
     thisFkAttr ?= @toSnakeCase(@modelName+"_id")
     thatFkAttr ?= attribute+"_id"
     thatTypeAttr ?= attribute+"_type"
@@ -361,7 +361,7 @@ exports.Model = class Model extends MztObject
     fkn[thatFkAttr] = thatTypeAttr
     linkModel.polyForeignKeys fkn
 
-    @relations[attribute] = 
+    @relations[attribute] =
       type: 'hasManyThroughPoly'
       otherModel: model
       linkModel: linkModel
@@ -392,7 +392,7 @@ exports.Model = class Model extends MztObject
       for link in linkModel.findByAttributes query
         link.destroy(options)
     @subscribe('destroy', onDeleteF)
-    
+
     onDeleteB = (instance, options={}) ->
       query = {}
       query[thatFkAttr] = instance.id
@@ -401,16 +401,16 @@ exports.Model = class Model extends MztObject
         link.destroy(options)
     model.subscribe('destroy', onDeleteB)
 
-  # hasManyThroughPolyReverse is a polymorphic many-to-many relation where both foreign 
+  # hasManyThroughPolyReverse is a polymorphic many-to-many relation where both foreign
   # keys and the type exist on a linkmodel.
   # - hasManyThroughPolyReverse is the opposite side of a hasManyThroughPoly relation
   hasManyThroughPolyReverse: (model, attribute, linkModel, thisFkAttr, thatFkAttr, thatTypeAttr) ->
-    attribute ?= @toSnakeCase(model.modelName) 
+    attribute ?= @toSnakeCase(model.modelName)
     thisFkAttr ?= @toSnakeCase(@modelName+"_id")
     thatFkAttr ?= attribute+"_id"
     thatTypeAttr ?= attribute+"_type"
 
-    @relations[attribute] = 
+    @relations[attribute] =
       type: 'hasManyThroughPolyReverse'
       otherModel: model
       linkModel: linkModel
@@ -455,14 +455,14 @@ exports.Model = class Model extends MztObject
     lst = []
     for id in ids
       if @exists(id)?
-        lst.push @records[id] 
+        lst.push @records[id]
     lst
 
   # select() returns an array of Instances, one for each record in a
   # query defined by the supplied callback. The callback should take
   # one parameter, which is the raw object in the datastore.
   # Caveat: Do not modify the object passed in any way, indexing/events
-  # will suffer accordingly if you do so. 
+  # will suffer accordingly if you do so.
   select: (callback) =>
     @findAll @selectIds callback
 
@@ -472,20 +472,20 @@ exports.Model = class Model extends MztObject
   selectIds: (callback) =>
     res = []
     for id, rec of @records
-      if callback(rec) 
+      if callback(rec)
         res.push id
     res
 
   # selectAsMap is the same as selectIds() except it returns an
-  # object instead of an array, with the id as the key and the record 
-  # as the value 
+  # object instead of an array, with the id as the key and the record
+  # as the value
   # i.e. if select() returns [0,4,64,2]
   # selectAsMap() returns { 0:<record(0)>, 4:<record(4)>,
   # 64:<record(64)>, 2:<record(2)> }
   selectAsMap: (callback) =>
     res = {}
     for id, rec of @records
-      if callback(rec) 
+      if callback(rec)
         res[id] = rec
     res
 
@@ -604,11 +604,13 @@ exports.Model = class Model extends MztObject
     throw new Error "Model.rebuildIndex: Index #{attrName} does not exist" unless @indexes[attrName]?
     @indexes[attrName].update(record, oldValue, newValue)
 
-  addToIndexes: (record) ->
+  addToIndexes: (record) =>
     for attrName, index of @indexes
+      Model.prototype['findBy'+attrName] = (needle) ->
+        this.findByAttribute(attrName, needle)
       index.add(record)
 
-  removeFromIndexes: (record) ->
+  removeFromIndexes: (record) =>
     for attrName, index of @indexes
       index.remove(record)
 
