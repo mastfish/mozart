@@ -84,11 +84,13 @@ exports.Collection = class Collection extends View
   # Create a View for a data item
   #
   # @param instance [Mozart.DataInstance] The content for the new view
-  createView: (instance) =>
+  createView: (instance, index) =>
     Util.log('collection','createView', instance,'layout',@layout.rootElement)
 
     obj = 
       content: instance
+      index: index
+      isfirst: (index == 0)
       parent: @
 
     obj.tag = 'li' if @viewClass == View
@@ -140,7 +142,7 @@ exports.Collection = class Collection extends View
       unless @hidden[item.id]?
         unless count<start or page>=@pageSize
           unless @itemViews[item.id]?
-            @createView(item)
+            @createView(item, count) 
           @element.append(@itemViews[item.id].element)
           page++
         rows++
